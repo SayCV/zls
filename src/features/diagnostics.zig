@@ -540,7 +540,7 @@ pub const BuildOnSave = struct {
         defer argv.deinit(options.allocator);
 
         argv.appendSliceAssumeCapacity(base_args);
-        if (options.check_step_only) argv.appendAssumeCapacity("--check-only");
+        //if (options.check_step_only) argv.appendAssumeCapacity("--check-only");
         argv.appendSliceAssumeCapacity(options.build_on_save_args);
 
         var child_process = std.process.spawn(options.io, .{
