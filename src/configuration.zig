@@ -97,8 +97,8 @@ pub const Manager = struct {
         defer manager.impl.arena = arena_allocator.state;
 
         var duped: UnresolvedConfig = .{};
-        inline for (std.meta.fields(UnresolvedConfig)) |field| {
-            @field(duped, field.name) = try option.dupe(field.type, @field(config, field.name), arena_allocator.allocator());
+        inline for (comptime std.meta.fieldNames(UnresolvedConfig), comptime std.meta.fieldTypes(UnresolvedConfig)) |field_name, field_type| {
+            @field(duped, field_name) = try option.dupe(field_type, @field(config, field_name), arena_allocator.allocator());
         }
         manager.impl.configs.set(tag, duped);
         manager.impl.is_dirty = true;
@@ -111,8 +111,8 @@ pub const Manager = struct {
         config: *const Config,
     ) error{OutOfMemory}!void {
         var cfg: UnresolvedConfig = .{};
-        inline for (std.meta.fields(Config)) |field| {
-            @field(cfg, field.name) = @field(config, field.name);
+        inline for (comptime std.meta.fieldNames(Config)) |field_name| {
+            @field(cfg, field_name) = @field(config, field_name);
         }
         try manager.setConfiguration(tag, &cfg);
     }
@@ -150,9 +150,9 @@ pub const Manager = struct {
             .global_cache_path = if (builtin.os.tag == .wasi) "/cache" else null,
         };
         for (manager.impl.configs.values) |unresolved_config| {
-            inline for (std.meta.fields(UnresolvedConfig)) |field| {
-                if (@field(unresolved_config, field.name)) |new_value| {
-                    @field(config, field.name) = new_value;
+            inline for (comptime std.meta.fieldNames(UnresolvedConfig)) |field_name| {
+                if (@field(unresolved_config, field_name)) |new_value| {
+                    @field(config, field_name) = new_value;
                 }
             }
         }
@@ -364,15 +364,15 @@ pub const Manager = struct {
 
         var did_change: DidConfigChange = .{};
 
-        inline for (std.meta.fields(Config)) |field| {
-            const old_value = &@field(manager.config, field.name);
-            const new_value = @field(config, field.name);
+        inline for (comptime std.meta.fieldNames(Config), comptime std.meta.fieldTypes(Config)) |field_name, field_type| {
+            const old_value = &@field(manager.config, field_name);
+            const new_value = @field(config, field_name);
 
-            const is_eql = option.eql(field.type, old_value.*, new_value);
-            @field(did_change, field.name) = !is_eql;
+            const is_eql = option.eql(field_type, old_value.*, new_value);
+            @field(did_change, field_name) = !is_eql;
 
             if (!is_eql) {
-                old_value.* = try option.dupe(field.type, new_value, arena_allocator.allocator());
+                old_value.* = try option.dupe(field_type, new_value, arena_allocator.allocator());
             }
         }
 
