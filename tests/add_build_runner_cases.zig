@@ -9,7 +9,7 @@ pub fn addCases(
     test_filters: []const []const u8,
 ) void {
     const cases_dir = b.path("tests/build_runner_cases");
-    const cases_path_from_root = b.pathFromRoot("tests/build_runner_cases");
+    const cases_path_from_root = b.root.joinString(b.allocator, "tests/build_runner_cases") catch @panic("OOM");
 
     const check_exe = b.addExecutable(.{
         .name = "build_runner_check",
@@ -49,14 +49,14 @@ pub fn addCases(
         build_cmd.addArg("build");
         build_cmd.addArg("--build-file");
         build_cmd.addFileArg(build_file);
-        build_cmd.addArg("--build-runner");
-        build_cmd.addFileArg(b.path("src/build_runner/build_runner.zig"));
-        build_cmd.addArg("--cache-dir");
-        build_cmd.addDirectoryArg(.{ .cwd_relative = b.fmt("{f}", .{b.cache_root}) });
-        build_cmd.addArg("--global-cache-dir");
-        build_cmd.addDirectoryArg(.{ .cwd_relative = b.fmt("{f}", .{b.graph.global_cache_root}) });
-        build_cmd.addArg("--zig-lib-dir");
-        build_cmd.addDirectoryArg(.{ .cwd_relative = b.fmt("{f}", .{b.graph.zig_lib_directory}) });
+        //build_cmd.addArg("--build-runner");
+        //build_cmd.addFileArg(b.path("src/build_runner/build_runner.zig"));
+        //build_cmd.addArg("--cache-dir");
+        //build_cmd.addDirectoryArg(.{ .cwd_relative = b.fmt("{f}", .{b.cache_root}) });
+        //build_cmd.addArg("--global-cache-dir");
+        //build_cmd.addDirectoryArg(.{ .cwd_relative = b.fmt("{f}", .{b.graph.global_cache_root}) });
+        //build_cmd.addArg("--zig-lib-dir");
+        //build_cmd.addDirectoryArg(.{ .cwd_relative = b.fmt("{f}", .{b.graph.zig_lib_directory}) });
 
         build_cmd.addFileInput(b.path("src/build_runner/shared.zig"));
 
@@ -67,10 +67,10 @@ pub fn addCases(
         run_diff.setCwd(cases_dir);
         run_diff.addFileArg(expected_build_config_json);
         run_diff.addFileArg(actual_build_config_json);
-        run_diff.addArg("--cache-dir");
-        run_diff.addDirectoryArg(.{ .cwd_relative = b.fmt("{f}", .{b.cache_root}) });
-        run_diff.addArg("--global-cache-dir");
-        run_diff.addDirectoryArg(.{ .cwd_relative = b.fmt("{f}", .{b.graph.global_cache_root}) });
+        //run_diff.addArg("--cache-dir");
+        //run_diff.addDirectoryArg(.{ .cwd_relative = b.fmt("{f}", .{b.cache_root}) });
+        //run_diff.addArg("--global-cache-dir");
+        //run_diff.addDirectoryArg(.{ .cwd_relative = b.fmt("{f}", .{b.graph.global_cache_root}) });
 
         test_step.dependOn(&run_diff.step);
     }

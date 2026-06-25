@@ -1287,8 +1287,8 @@ fn prepareBuildRunnerArgs(self: *DocumentStore, build_file_uri: Uri) error{OutOf
     const base_args = &[_][]const u8{
         self.config.zig_exe_path.?,
         "build",
-        "--build-runner",
-        self.config.build_runner_path.?,
+        //"--build-runner",
+        //self.config.build_runner_path.?,
         "--zig-lib-dir",
         self.config.zig_lib_dir.?.path orelse ".",
     };
